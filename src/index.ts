@@ -11,31 +11,41 @@ enum FigureType {
     KING = 'King'
 }
 
-interface IFigure {
-    color: string
-    power: number
-    x: number
-    y: number
-
-    doMove: (x: number, y: number) => void
+enum FigureImage {
+    PAWN = 'Pawn',
+    KNIGHT = 'Knight',
+    BISHOP = 'Bishop',
+    QUEEN = 'Queen',
+    KING = 'King'
 }
 
-abstract class Figure implements IFigure {
+interface FigureData {
+    type: string
     color: string
-    power: number
-    x: number
-    y: number
+    position: { x: number, y: number }
+
+    // doMove: (x: number, y: number) => void
+}
+
+abstract class Figure implements FigureData {
+    type: string
+    color: string
+    // color: FigureColors.WHITE | FigureColors.BLACK
+    position: {x: number, y: number}
     
-    constructor(color, power) {
+    constructor(type: string, color: string, position: {x: number, y: number}) {
+        this.type = type
         this.color = color
-        this.power = power
+        this.position = position
     }
 
-    doMove(x: number, y: number): void {}
+    // doMove(x: number, y: number): void {}
 }
 
 class Pawn extends Figure {
-    name: string = FigureType.PAWN
+    constructor(type: string, color: string, position: {x: number, y: number}) {
+        super(type, color, position)
+    }
 }
 
 class Knight extends Figure {

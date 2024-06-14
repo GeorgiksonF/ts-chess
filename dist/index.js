@@ -26,24 +26,30 @@ var FigureType;
     FigureType["QUEEN"] = "Queen";
     FigureType["KING"] = "King";
 })(FigureType || (FigureType = {}));
-var Figure = /** @class */ (function () {
-    function Figure(color, power) {
+var FigureImage;
+(function (FigureImage) {
+    FigureImage["PAWN"] = "Pawn";
+    FigureImage["KNIGHT"] = "Knight";
+    FigureImage["BISHOP"] = "Bishop";
+    FigureImage["QUEEN"] = "Queen";
+    FigureImage["KING"] = "King";
+})(FigureImage || (FigureImage = {}));
+var Figure = (function () {
+    function Figure(type, color, position) {
+        this.type = type;
         this.color = color;
-        this.power = power;
+        this.position = position;
     }
-    Figure.prototype.doMove = function (x, y) { };
     return Figure;
 }());
-var Pawn = /** @class */ (function (_super) {
+var Pawn = (function (_super) {
     __extends(Pawn, _super);
-    function Pawn() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.name = FigureType.PAWN;
-        return _this;
+    function Pawn(type, color, position) {
+        return _super.call(this, type, color, position) || this;
     }
     return Pawn;
 }(Figure));
-var Knight = /** @class */ (function (_super) {
+var Knight = (function (_super) {
     __extends(Knight, _super);
     function Knight() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -52,7 +58,7 @@ var Knight = /** @class */ (function (_super) {
     }
     return Knight;
 }(Figure));
-var Bishop = /** @class */ (function (_super) {
+var Bishop = (function (_super) {
     __extends(Bishop, _super);
     function Bishop() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -61,7 +67,7 @@ var Bishop = /** @class */ (function (_super) {
     }
     return Bishop;
 }(Figure));
-var Queen = /** @class */ (function (_super) {
+var Queen = (function (_super) {
     __extends(Queen, _super);
     function Queen() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -70,7 +76,7 @@ var Queen = /** @class */ (function (_super) {
     }
     return Queen;
 }(Figure));
-var King = /** @class */ (function (_super) {
+var King = (function (_super) {
     __extends(King, _super);
     function King() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -79,15 +85,11 @@ var King = /** @class */ (function (_super) {
     }
     return King;
 }(Figure));
-var ChessBoard = /** @class */ (function () {
+var ChessBoard = (function () {
     function ChessBoard() {
         this.numberCellsWide = 8;
         this.numberCellsHeight = 8;
     }
-    // constructor(numberCellsWide?: number, numberCellsHeight?: number) {
-    //     this.numberCellsWide = numberCellsWide
-    //     this.numberCellsHeight = numberCellsHeight
-    // }
     ChessBoard.prototype.drowBoard = function () {
         var field = document.querySelector('#app');
         for (var i = 0; i < this.numberCellsWide; i++) {
@@ -104,7 +106,7 @@ var ChessBoard = /** @class */ (function () {
     };
     return ChessBoard;
 }());
-var Cell = /** @class */ (function () {
+var Cell = (function () {
     function Cell() {
         this.width = 40;
         this.heingth = 40;
@@ -117,3 +119,4 @@ function init() {
     board.drowBoard();
 }
 init();
+//# sourceMappingURL=index.js.map
