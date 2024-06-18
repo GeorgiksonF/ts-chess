@@ -34,57 +34,52 @@ var FigureImage;
     FigureImage["QUEEN"] = "Queen";
     FigureImage["KING"] = "King";
 })(FigureImage || (FigureImage = {}));
-var Figure = (function () {
-    function Figure(type, color, position) {
-        this.type = type;
-        this.color = color;
-        this.position = position;
+var figures = [
+    { type: FigureType.PAWN, color: FigureColors.WHITE, position: { x: 0, y: 1 } },
+    { type: FigureType.PAWN, color: FigureColors.WHITE, position: { x: 1, y: 1 } },
+    { type: FigureType.PAWN, color: FigureColors.WHITE, position: { x: 2, y: 1 } },
+    { type: FigureType.PAWN, color: FigureColors.WHITE, position: { x: 3, y: 1 } },
+    { type: FigureType.PAWN, color: FigureColors.WHITE, position: { x: 4, y: 1 } },
+    { type: FigureType.PAWN, color: FigureColors.WHITE, position: { x: 5, y: 1 } },
+    { type: FigureType.PAWN, color: FigureColors.WHITE, position: { x: 6, y: 1 } },
+    { type: FigureType.PAWN, color: FigureColors.WHITE, position: { x: 7, y: 1 } },
+    { type: FigureType.PAWN, color: FigureColors.BLACK, position: { x: 0, y: 6 } },
+    { type: FigureType.PAWN, color: FigureColors.BLACK, position: { x: 1, y: 6 } },
+    { type: FigureType.PAWN, color: FigureColors.BLACK, position: { x: 2, y: 6 } },
+    { type: FigureType.PAWN, color: FigureColors.BLACK, position: { x: 3, y: 6 } },
+    { type: FigureType.PAWN, color: FigureColors.BLACK, position: { x: 4, y: 6 } },
+    { type: FigureType.PAWN, color: FigureColors.BLACK, position: { x: 5, y: 6 } },
+    { type: FigureType.PAWN, color: FigureColors.BLACK, position: { x: 6, y: 6 } },
+    { type: FigureType.PAWN, color: FigureColors.BLACK, position: { x: 7, y: 6 } },
+];
+var ChessFigureFactory = (function () {
+    function ChessFigureFactory() {
     }
-    return Figure;
+    return ChessFigureFactory;
 }());
-var Pawn = (function (_super) {
-    __extends(Pawn, _super);
-    function Pawn(type, color, position) {
-        return _super.call(this, type, color, position) || this;
+var PawnFactory = (function (_super) {
+    __extends(PawnFactory, _super);
+    function PawnFactory() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    PawnFactory.prototype.createPiece = function (figure) {
+        return new Pawn(figure);
+    };
+    return PawnFactory;
+}(ChessFigureFactory));
+var Pawn = (function () {
+    function Pawn(figure) {
+        this.type = figure.type;
+        this.color = figure.color;
+        this.position = figure.position;
     }
     return Pawn;
-}(Figure));
-var Knight = (function (_super) {
-    __extends(Knight, _super);
-    function Knight() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.name = FigureType.KNIGHT;
-        return _this;
+}());
+var ChessBoardAcrions = (function () {
+    function ChessBoardAcrions() {
     }
-    return Knight;
-}(Figure));
-var Bishop = (function (_super) {
-    __extends(Bishop, _super);
-    function Bishop() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.name = FigureType.BISHOP;
-        return _this;
-    }
-    return Bishop;
-}(Figure));
-var Queen = (function (_super) {
-    __extends(Queen, _super);
-    function Queen() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.name = FigureType.QUEEN;
-        return _this;
-    }
-    return Queen;
-}(Figure));
-var King = (function (_super) {
-    __extends(King, _super);
-    function King() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.name = FigureType.KING;
-        return _this;
-    }
-    return King;
-}(Figure));
+    return ChessBoardAcrions;
+}());
 var ChessBoard = (function () {
     function ChessBoard() {
         this.numberCellsWide = 8;
@@ -104,6 +99,26 @@ var ChessBoard = (function () {
             field.append(row);
         }
     };
+    ChessBoard.prototype.placeFigures = function (figures) {
+        var _a;
+        var factoryMap = (_a = {},
+            _a[FigureType.PAWN] = new PawnFactory(),
+            _a);
+        figures.forEach(function (figureData) {
+            var factory = factoryMap[figureData.type];
+            if (factory) {
+                var fugure = factory.createPiece(figureData);
+                var row = document.querySelectorAll('.row')[fugure.position.y];
+                var ceil = row.childNodes[fugure.position.x];
+                var figure = document.createElement('div');
+                figure.classList.add(fugure.type.toLowerCase());
+                ceil.append(figure);
+            }
+            else {
+                console.error("\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u044B\u0439 \u0442\u0438\u043F \u0444\u0438\u0433\u0443\u0440\u044B: ".concat(figureData.type));
+            }
+        });
+    };
     return ChessBoard;
 }());
 var Cell = (function () {
@@ -117,6 +132,7 @@ var Cell = (function () {
 function init() {
     var board = new ChessBoard();
     board.drowBoard();
+    board.placeFigures(figures);
 }
 init();
 //# sourceMappingURL=index.js.map

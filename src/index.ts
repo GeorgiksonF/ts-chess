@@ -19,58 +19,60 @@ enum FigureImage {
     KING = 'King'
 }
 
-interface FigureData {
+interface ChessFigure {
     type: string
     color: string
     position: { x: number, y: number }
-
-    // doMove: (x: number, y: number) => void
 }
 
-abstract class Figure implements FigureData {
-    type: string
-    color: string
-    // color: FigureColors.WHITE | FigureColors.BLACK
-    position: {x: number, y: number}
-    
-    constructor(type: string, color: string, position: {x: number, y: number}) {
-        this.type = type
-        this.color = color
-        this.position = position
+const figures: Array<ChessFigure> = [
+    {type: FigureType.PAWN, color: FigureColors.WHITE, position: {x: 0, y: 1}},
+    {type: FigureType.PAWN, color: FigureColors.WHITE, position: {x: 1, y: 1}},
+    {type: FigureType.PAWN, color: FigureColors.WHITE, position: {x: 2, y: 1}},
+    {type: FigureType.PAWN, color: FigureColors.WHITE, position: {x: 3, y: 1}},
+    {type: FigureType.PAWN, color: FigureColors.WHITE, position: {x: 4, y: 1}},
+    {type: FigureType.PAWN, color: FigureColors.WHITE, position: {x: 5, y: 1}},
+    {type: FigureType.PAWN, color: FigureColors.WHITE, position: {x: 6, y: 1}},
+    {type: FigureType.PAWN, color: FigureColors.WHITE, position: {x: 7, y: 1}},
+    {type: FigureType.PAWN, color: FigureColors.BLACK, position: {x: 0, y: 6}},
+    {type: FigureType.PAWN, color: FigureColors.BLACK, position: {x: 1, y: 6}},
+    {type: FigureType.PAWN, color: FigureColors.BLACK, position: {x: 2, y: 6}},
+    {type: FigureType.PAWN, color: FigureColors.BLACK, position: {x: 3, y: 6}},
+    {type: FigureType.PAWN, color: FigureColors.BLACK, position: {x: 4, y: 6}},
+    {type: FigureType.PAWN, color: FigureColors.BLACK, position: {x: 5, y: 6}},
+    {type: FigureType.PAWN, color: FigureColors.BLACK, position: {x: 6, y: 6}},
+    {type: FigureType.PAWN, color: FigureColors.BLACK, position: {x: 7, y: 6}},
+]
+
+
+abstract class ChessFigureFactory {
+    abstract createPiece(figure: ChessFigure): ChessFigure;
+}
+
+class PawnFactory extends ChessFigureFactory {
+    createPiece(figure: ChessFigure): ChessFigure {
+      return new Pawn(figure); // Создаем объект Pawn
     }
+  }
 
-    // doMove(x: number, y: number): void {}
-}
+class Pawn {
+    type
+    color
+    position
 
-class Pawn extends Figure {
-    constructor(type: string, color: string, position: {x: number, y: number}) {
-        super(type, color, position)
+    constructor(figure: ChessFigure) {
+        this.type = figure.type
+        this.color = figure.color
+        this.position = figure.position
     }
 }
 
-class Knight extends Figure {
-    name: string = FigureType.KNIGHT
-}
-class Bishop extends Figure {
-    name: string = FigureType.BISHOP
-}
-class Queen extends Figure {
-    name: string = FigureType.QUEEN
-}
+class ChessBoardAcrions {
 
-class King extends Figure {
-    name: string = FigureType.KING
 }
-
 class ChessBoard {
-    private name: string
     private numberCellsWide: number = 8
     private numberCellsHeight: number = 8
-    
-    // constructor(numberCellsWide?: number, numberCellsHeight?: number) {
-    //     this.numberCellsWide = numberCellsWide
-    //     this.numberCellsHeight = numberCellsHeight
-    // }
 
     drowBoard(): void {
         const field: HTMLElement | any = document.querySelector('#app')
@@ -90,7 +92,28 @@ class ChessBoard {
             field.append(row)
         }
     }
-    
+
+    placeFigures(figures: ChessFigure[]): void {
+        const factoryMap: { [key: string]: ChessFigureFactory }  = {
+            [FigureType.PAWN]: new PawnFactory()
+        };
+
+        figures.forEach(figureData => {
+            const factory = factoryMap[figureData.type]
+            
+            if (factory) {
+                const fugure = factory.createPiece(figureData);
+                const row: HTMLElement | any = document.querySelectorAll('.row')[fugure.position.y]
+                const ceil: HTMLElement | any = row.childNodes[fugure.position.x]
+                const figure: HTMLElement | any = document.createElement('div')
+                figure.classList.add(fugure.type.toLowerCase())
+                ceil.append(figure)
+            } else {
+                console.error(`Неизвестный тип фигуры: ${figureData.type}`);
+            }
+        })
+
+    }
 }
 
 class Cell {
@@ -103,8 +126,8 @@ class Cell {
 
 function init(): void {
     const board = new ChessBoard()
-
     board.drowBoard()
+    board.placeFigures(figures)
 }
 
 init()
