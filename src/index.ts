@@ -78,17 +78,30 @@ class Pawn {
     }
 }
 
-class ChessBoardAcrions {
+class Cell {
+    private width: number = 40
+    private heingth: number = 40
+    private hasFigure: boolean = false
+    private xCoord?: number
+    private yCoord?: number
+}
+
+class ChessBoardActions {
 
 }
 class ChessBoard {
     private numberCellsWide: number = 8
     private numberCellsHeight: number = 8
+    private boardElement: HTMLElement
 
-    drowBoard(): void {
-        const field: HTMLElement | any = document.querySelector('#app')
-        const board: HTMLElement | any = document.createElement('div')
-        board.classList.add('board')
+    constructor() {
+        this.createBoard()
+    }
+
+    createBoard(): HTMLElement | any {
+        
+        this.boardElement = document.createElement('div')
+        this.boardElement.classList.add('board')
         
         for (let rowIndex = 0; rowIndex < this.numberCellsWide; rowIndex++) {
             const row: HTMLElement | any = document.createElement('div')
@@ -97,7 +110,6 @@ class ChessBoard {
 
     
             for (let ceilIndex = 0; ceilIndex < this.numberCellsHeight; ceilIndex++) {
-                row
                 const ceilItem: HTMLElement | any = document.createElement('div')
                 const colorClass: string = (rowIndex + ceilIndex) % 2 === 0 ? 'black' : 'white'
                 const ceilYCoord = Object.values(BoardCoordsY)[ceilIndex]
@@ -107,10 +119,14 @@ class ChessBoard {
                 row.append(ceilItem)
             }
 
-            board.append(row)
+            this.boardElement.append(row)
         }
 
-        field.append(board)
+        return this.boardElement
+    }
+
+    getBoard() {
+        return this.boardElement
     }
 
     placeFigures(figures: ChessFigure[]): void {
@@ -123,7 +139,7 @@ class ChessBoard {
             
             if (factory) {
                 const fugure = factory.createPiece(figureData);
-                const ceil: HTMLElement | any = document.getElementsByClassName(figureData.position)[0]
+                const ceil: HTMLElement | any = document.querySelector(figureData.position)
                 const figure: HTMLElement | any = document.createElement('div')
                 figure.classList.add(fugure.type.toLowerCase())
                 ceil.append(figure)
@@ -135,18 +151,37 @@ class ChessBoard {
     }
 }
 
-class Cell {
-    private width: number = 40
-    private heingth: number = 40
-    private hasFigure: boolean = false
-    private xCoord?: number
-    private yCoord?: number
+class Game {
+    private boardElement: HTMLElement
+
+    constructor() {
+        const boardItem = new ChessBoard()
+        this.boardElement = boardItem.getBoard()
+    }
+
+    getBoard(): HTMLElement {
+        return this.boardElement
+    }
 }
 
+class App {
+    private game: Game
+    
+    constructor(private root: string) {
+        this.game = new Game()
+    }
+
+    mount() {
+        const root = document.querySelector(this.root)
+        root.append(this.game.getBoard())
+    }
+}
+
+
+
 function init(): void {
-    const board = new ChessBoard()
-    board.drowBoard()
-    board.placeFigures(figures)
+    const app = new App('#app')
+    app.mount()
 }
 
 init()

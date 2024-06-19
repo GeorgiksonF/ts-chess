@@ -86,25 +86,32 @@ var Pawn = (function () {
     }
     return Pawn;
 }());
-var ChessBoardAcrions = (function () {
-    function ChessBoardAcrions() {
+var Cell = (function () {
+    function Cell() {
+        this.width = 40;
+        this.heingth = 40;
+        this.hasFigure = false;
     }
-    return ChessBoardAcrions;
+    return Cell;
+}());
+var ChessBoardActions = (function () {
+    function ChessBoardActions() {
+    }
+    return ChessBoardActions;
 }());
 var ChessBoard = (function () {
     function ChessBoard() {
         this.numberCellsWide = 8;
         this.numberCellsHeight = 8;
+        this.createBoard();
     }
-    ChessBoard.prototype.drowBoard = function () {
-        var field = document.querySelector('#app');
-        var board = document.createElement('div');
-        board.classList.add('board');
+    ChessBoard.prototype.createBoard = function () {
+        this.boardElement = document.createElement('div');
+        this.boardElement.classList.add('board');
         for (var rowIndex = 0; rowIndex < this.numberCellsWide; rowIndex++) {
             var row = document.createElement('div');
             row.classList.add('row');
             for (var ceilIndex = 0; ceilIndex < this.numberCellsHeight; ceilIndex++) {
-                row;
                 var ceilItem = document.createElement('div');
                 var colorClass = (rowIndex + ceilIndex) % 2 === 0 ? 'black' : 'white';
                 var ceilYCoord = Object.values(BoardCoordsY)[ceilIndex];
@@ -112,9 +119,12 @@ var ChessBoard = (function () {
                 ceilItem.classList.add('ceil', ceilClass, colorClass);
                 row.append(ceilItem);
             }
-            board.append(row);
+            this.boardElement.append(row);
         }
-        field.append(board);
+        return this.boardElement;
+    };
+    ChessBoard.prototype.getBoard = function () {
+        return this.boardElement;
     };
     ChessBoard.prototype.placeFigures = function (figures) {
         var _a;
@@ -125,7 +135,7 @@ var ChessBoard = (function () {
             var factory = factoryMap[figureData.type];
             if (factory) {
                 var fugure = factory.createPiece(figureData);
-                var ceil = document.getElementsByClassName(figureData.position)[0];
+                var ceil = document.querySelector(figureData.position);
                 var figure = document.createElement('div');
                 figure.classList.add(fugure.type.toLowerCase());
                 ceil.append(figure);
@@ -137,18 +147,30 @@ var ChessBoard = (function () {
     };
     return ChessBoard;
 }());
-var Cell = (function () {
-    function Cell() {
-        this.width = 40;
-        this.heingth = 40;
-        this.hasFigure = false;
+var Game = (function () {
+    function Game() {
+        var boardItem = new ChessBoard();
+        this.boardElement = boardItem.getBoard();
     }
-    return Cell;
+    Game.prototype.getBoard = function () {
+        return this.boardElement;
+    };
+    return Game;
+}());
+var App = (function () {
+    function App(root) {
+        this.root = root;
+        this.game = new Game();
+    }
+    App.prototype.mount = function () {
+        var root = document.querySelector(this.root);
+        root.append(this.game.getBoard());
+    };
+    return App;
 }());
 function init() {
-    var board = new ChessBoard();
-    board.drowBoard();
-    board.placeFigures(figures);
+    var app = new App('#app');
+    app.mount();
 }
 init();
 //# sourceMappingURL=index.js.map
