@@ -1,6 +1,6 @@
 enum FigureColors {
-    WHITE = 'WHITE',
-    BLACK = 'BLACK' 
+    WHITE = 'white',
+    BLACK = 'black' 
 }
 
 enum FigureType {
@@ -77,52 +77,56 @@ class Pawn {
         this.position = figure.position
     }
 }
-
-class Cell {
-    private width: number = 40
-    private heingth: number = 40
-    private hasFigure: boolean = false
-    private xCoord?: number
-    private yCoord?: number
-}
-
 class ChessBoardActions {
 
 }
+
+class Cell {
+    private readonly width: number = 40
+    private readonly heingth: number = 40
+    private hasFigure: boolean = false
+    private position: string
+    private cell: HTMLElement
+    private color: string
+    
+    constructor(rowIndex: number, columnIndex: number) {
+        this.cell = document.createElement('div')
+        this.color = (rowIndex + columnIndex) % 2 === 0 ? FigureColors.BLACK : FigureColors.WHITE
+        this.position = `${Object.values(BoardCoordsY)[columnIndex]}${columnIndex}`
+        this.cell.classList.add('cell', this.position, this.color)
+    }
+
+    getCell() {
+        return this.cell
+    }
+}
+
 class ChessBoard {
-    private numberCellsWide: number = 8
-    private numberCellsHeight: number = 8
+    private readonly numberCellsWide: number = 8
+    private readonly numberCellsHeight: number = 8
     private boardElement: HTMLElement
+    private readonly cellFactories: Map<FigureType, ChessFigureFactory>;
 
     constructor() {
+        this.boardElement = document.createElement('div')
+        this.boardElement.classList.add('board')
         this.createBoard()
     }
 
-    createBoard(): HTMLElement | any {
-        
-        this.boardElement = document.createElement('div')
-        this.boardElement.classList.add('board')
-        
+    createBoard(): void {
         for (let rowIndex = 0; rowIndex < this.numberCellsWide; rowIndex++) {
-            const row: HTMLElement | any = document.createElement('div')
+            const row = document.createElement('div')
             row.classList.add('row')
-
-
-    
-            for (let ceilIndex = 0; ceilIndex < this.numberCellsHeight; ceilIndex++) {
-                const ceilItem: HTMLElement | any = document.createElement('div')
-                const colorClass: string = (rowIndex + ceilIndex) % 2 === 0 ? 'black' : 'white'
-                const ceilYCoord = Object.values(BoardCoordsY)[ceilIndex]
-                const ceilClass = `${ceilYCoord}${rowIndex + 1}`
-                ceilItem.classList.add('ceil', ceilClass, colorClass)
-    
-                row.append(ceilItem)
-            }
-
+            this.createRowCells(row, rowIndex)
             this.boardElement.append(row)
         }
+    }
 
-        return this.boardElement
+    private createRowCells(row: HTMLElement, rowIndex: number): void {
+        for (let columnIndex = 0; columnIndex < this.numberCellsHeight; columnIndex++) {
+            const cell: HTMLElement = new Cell(rowIndex, columnIndex).getCell()
+            row.appendChild(cell)
+        }
     }
 
     getBoard() {
@@ -130,6 +134,7 @@ class ChessBoard {
     }
 
     placeFigures(figures: ChessFigure[]): void {
+        const cells = this.boardElement.querySelectorAll('.cell')
         const factoryMap: { [key: string]: ChessFigureFactory }  = {
             [FigureType.PAWN]: new PawnFactory()
         };
@@ -139,10 +144,10 @@ class ChessBoard {
             
             if (factory) {
                 const fugure = factory.createPiece(figureData);
-                const ceil: HTMLElement | any = document.querySelector(figureData.position)
-                const figure: HTMLElement | any = document.createElement('div')
+                const cell: HTMLElement = document.querySelector(figureData.position)
+                const figure: HTMLElement = document.createElement('div')
                 figure.classList.add(fugure.type.toLowerCase())
-                ceil.append(figure)
+                cell.append(figure)
             } else {
                 console.error(`Неизвестный тип фигуры: ${figureData.type}`);
             }

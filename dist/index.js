@@ -15,8 +15,8 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var FigureColors;
 (function (FigureColors) {
-    FigureColors["WHITE"] = "WHITE";
-    FigureColors["BLACK"] = "BLACK";
+    FigureColors["WHITE"] = "white";
+    FigureColors["BLACK"] = "black";
 })(FigureColors || (FigureColors = {}));
 var FigureType;
 (function (FigureType) {
@@ -86,48 +86,54 @@ var Pawn = (function () {
     }
     return Pawn;
 }());
-var Cell = (function () {
-    function Cell() {
-        this.width = 40;
-        this.heingth = 40;
-        this.hasFigure = false;
-    }
-    return Cell;
-}());
 var ChessBoardActions = (function () {
     function ChessBoardActions() {
     }
     return ChessBoardActions;
 }());
+var Cell = (function () {
+    function Cell(rowIndex, columnIndex) {
+        this.width = 40;
+        this.heingth = 40;
+        this.hasFigure = false;
+        this.cell = document.createElement('div');
+        this.color = (rowIndex + columnIndex) % 2 === 0 ? FigureColors.BLACK : FigureColors.WHITE;
+        this.position = "".concat(Object.values(BoardCoordsY)[columnIndex]).concat(columnIndex);
+        this.cell.classList.add('cell', this.position, this.color);
+    }
+    Cell.prototype.getCell = function () {
+        return this.cell;
+    };
+    return Cell;
+}());
 var ChessBoard = (function () {
     function ChessBoard() {
         this.numberCellsWide = 8;
         this.numberCellsHeight = 8;
+        this.boardElement = document.createElement('div');
+        this.boardElement.classList.add('board');
         this.createBoard();
     }
     ChessBoard.prototype.createBoard = function () {
-        this.boardElement = document.createElement('div');
-        this.boardElement.classList.add('board');
         for (var rowIndex = 0; rowIndex < this.numberCellsWide; rowIndex++) {
             var row = document.createElement('div');
             row.classList.add('row');
-            for (var ceilIndex = 0; ceilIndex < this.numberCellsHeight; ceilIndex++) {
-                var ceilItem = document.createElement('div');
-                var colorClass = (rowIndex + ceilIndex) % 2 === 0 ? 'black' : 'white';
-                var ceilYCoord = Object.values(BoardCoordsY)[ceilIndex];
-                var ceilClass = "".concat(ceilYCoord).concat(rowIndex + 1);
-                ceilItem.classList.add('ceil', ceilClass, colorClass);
-                row.append(ceilItem);
-            }
+            this.createRowCells(row, rowIndex);
             this.boardElement.append(row);
         }
-        return this.boardElement;
+    };
+    ChessBoard.prototype.createRowCells = function (row, rowIndex) {
+        for (var columnIndex = 0; columnIndex < this.numberCellsHeight; columnIndex++) {
+            var cell = new Cell(rowIndex, columnIndex).getCell();
+            row.appendChild(cell);
+        }
     };
     ChessBoard.prototype.getBoard = function () {
         return this.boardElement;
     };
     ChessBoard.prototype.placeFigures = function (figures) {
         var _a;
+        var cells = this.boardElement.querySelectorAll('.cell');
         var factoryMap = (_a = {},
             _a[FigureType.PAWN] = new PawnFactory(),
             _a);
@@ -135,10 +141,10 @@ var ChessBoard = (function () {
             var factory = factoryMap[figureData.type];
             if (factory) {
                 var fugure = factory.createPiece(figureData);
-                var ceil = document.querySelector(figureData.position);
+                var cell = document.querySelector(figureData.position);
                 var figure = document.createElement('div');
                 figure.classList.add(fugure.type.toLowerCase());
-                ceil.append(figure);
+                cell.append(figure);
             }
             else {
                 console.error("\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u044B\u0439 \u0442\u0438\u043F \u0444\u0438\u0433\u0443\u0440\u044B: ".concat(figureData.type));
